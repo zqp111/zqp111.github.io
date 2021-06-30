@@ -27,7 +27,7 @@
     <link href="/2020/11/08/hello-world/"/>
     <url>/2020/11/08/hello-world/</url>
     
-    <content type="html"><![CDATA[<p>下面记录一下我是如何利用GitHub来搭建自己的博客。</p><h2 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h2>]]></content>
+    <content type="html"><![CDATA[<p>下面记录一下我是如何利用GitHub来搭建自己的博客。</p><h2 id="1-准备工作"><a href="#1-准备工作" class="headerlink" title="1. 准备工作"></a>1. 准备工作</h2><ul><li>安装Node.js</li></ul><p>官网为：<a href="https://nodejs.org/zh-cn/">https://nodejs.org/zh-cn/</a> 建议下载安装长期支持版。安装后win+r打开终端，测试npm命令行工具能不能用</p><pre><code class="hljs coffeescript"><span class="hljs-built_in">npm</span> -v</code></pre><p>注：若已安装过Node.js，可以查看一下版本号，确保和下面要安装的Hexo兼容</p><pre><code class="hljs crmsh"><span class="hljs-comment"># 查看Node.js版本</span><span class="hljs-keyword">node</span> <span class="hljs-title">-v</span></code></pre><p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/20210630162300.png" alt="20210630162300"></p><ul><li>安装git</li></ul><p>这个相信大家应该都有，没有的话去 <a href="https://git-scm.com/download/win">https://git-scm.com/download/win</a> 下载安装</p><ul><li>安装Hexo</li></ul><p>Hexo 是一个快速、简洁且高效的博客框架。Hexo 使用 Markdown（或其他渲染引擎）解析文章，在几秒内，即可利用靓丽的主题生成静态网页。</p><pre><code class="hljs avrasm"><span class="hljs-meta"># 安装hexo</span>npm install -g hexo-<span class="hljs-keyword">cli</span></code></pre>]]></content>
     
     
     
