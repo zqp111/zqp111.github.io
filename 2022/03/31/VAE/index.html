@@ -233,7 +233,7 @@
 <p>这里<strong>不能进行生成的一个解释</strong>是：</p>
 <p>对于AE模型，由于其encoder和decoder都是神经网络，使用了非线性变化的过程，其隐空间变量和原始空间之间可能并不能找到一个合理的关系，导致随机采样得到的解码结果往往是乱码或十分模糊。</p>
 <h3 id="VAE-1"><a href="#VAE-1" class="headerlink" title="VAE"></a>VAE</h3><p>上面说到，AE模型中的每个样本，都会映射到隐空间的一个点上，这导致其在隐空间中随机采样一个点并不能得到好的生成效果。VAE的想法与此不同，其不再将每个样本映射到隐空间的一个点上，而是将每一个样本都映射到一个分布上去，然后再从这个分布上采样一个点，去重建原本的样本，这样就做到了可以在隐空间中采样去生成图像。</p>
-<p><img src="image/2584918486.png" srcset="/img/loading.gif" alt="事实上，vae是为每个样本构造专属的正态分布，然后采样来重构"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/2584918486.png" srcset="/img/loading.gif" alt="事实上，vae是为每个样本构造专属的正态分布，然后采样来重构"></p>
 <p>图像来源<a target="_blank" rel="noopener" href="https://kexue.fm/archives/5253">科学空间</a></p>
 <p>生成模型的目标在于找到数据样本的分布，即我们给定一个数据集$X = {X_1, X_2, … X_n}$, 如果我们能找到一个分布$p(X)$, 其表示了数据集$X$的分布，那么我们就可以直接在$p(X)$中采样，得到所有的数据，包括数据集$X$中没有出现过的数据。然而这个目标是无法实现的，我们可以通过另一种方式来实现：</p>
 <p>$$p(X) = \sum_m p(m)p(x|m) = \int_zp(z)p(x|z)dz$$</p>
@@ -245,16 +245,16 @@
 <p>我们从上可以看出，因为我们已经假设p(z)，那么我们只要最大似然就可以很容易的优化$$p(X)$$，然而由于我们不可能去采样所有的$p(z)$，因此这种方法不可行。</p>
 <p>那么我们使用$q(z|x)$来辅助求解$p(x|z)$。我们的目标在于最大化$log ,p(X)$</p>
 <p>我们可以推导：</p>
-<p><img src="image/VAE.png" srcset="/img/loading.gif" alt="[公式]"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/VAE.png" srcset="/img/loading.gif" alt="[公式]"></p>
 <p>右边一项由于KL函数的性质，恒大于0，因此我们找到了$log , P(x)$的一个下界：</p>
-<p><img src="image/ELBO.png" srcset="/img/loading.gif" alt="[公式]"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/ELBO.png" srcset="/img/loading.gif" alt="[公式]"></p>
 <p>我们将其记做$L_b$，那么原式可以写作：</p>
 <p>$$logP(x) = L_b+KL(q(z|x)||P(z|x))$$</p>
 <p>根据公式，$P(x) = \int_zP(z)P(x|z)dz$，当我们固定了$P(x|z)$，那么$P(x)$就是固定的，而此时我们可以通过调整$q(z|x)$即编码器，来使得KL散度项趋近于零。也就是说，L_b项可以代表我们想要求的$logP$。</p>
 <p>那么我们的优化目标就可以变为优化$L_b$。</p>
-<p><img src="image/ELBO2.png" srcset="/img/loading.gif" alt="[公式]"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/ELBO2.png" srcset="/img/loading.gif" alt="[公式]"></p>
 <p>对于第一项，由于我们有假设$q \sim N(\mu, \delta^2), P(z) \sim N(0, 1)$，可以根据KL散度公式进行展开，推导过程借用：</p>
-<p><img src="image/KL.png" srcset="/img/loading.gif" alt="img"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/KL.png" srcset="/img/loading.gif" alt="img"></p>
 <p>对于第二项，我们可以将其表示为</p>
 <p>$$\int_zq(z|x)logP(x|z)dz = E_{q(z|x)}[logP(x|z)]$$</p>
 <p>可以将其理解为AE的损失函数。</p>

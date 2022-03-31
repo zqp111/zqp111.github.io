@@ -278,7 +278,7 @@
 <p>$$L_{recon} = ||X-\hat{X}||^2_2$$</p>
 <p>$$L_{commit} = \sum_{d=1}^D ||Z-sg(\hat{Z}^{(d)})||^2_2$$</p>
 <p>其中$sg(\cdot)$表示禁止梯度反传。</p>
-<h3 id="RQ-transformer"><a href="#RQ-transformer" class="headerlink" title="RQ-transformer"></a>RQ-transformer</h3><p><img src="image/image-20220330185756506.png" srcset="/img/loading.gif" alt="image-20220330185756506"></p>
+<h3 id="RQ-transformer"><a href="#RQ-transformer" class="headerlink" title="RQ-transformer"></a>RQ-transformer</h3><p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/image-20220330185756506.png" srcset="/img/loading.gif" alt="image-20220330185756506"></p>
 <p>分为空间transformer和深度D的transformer两部分</p>
 <p>空间tansformer将$\hat{Z}^{(d-1)}$作为输入，来预测下一个值，第一个embedding使用可训练的embedding，并在不同的子任务中使用方式不同，例如在text-condition的任务中，使用text embedding作为头。</p>
 <p>$$u_t = PE_T(t) + \sum_{d=1}^D e(S_{t-1, d}) , , for , t &gt; 1$$</p>
@@ -286,7 +286,7 @@
 <p>$$v_{td} = PE_D(d)+\sum_{d’=1}^{d-1} e(S_{td’}) , , for , d&gt;1$$</p>
 <p>和空间基本类似，但特殊的，其第一个输入为当前t的空间transformer输出，即可以把深度D看为一个循环预测的transformer。$d=1, v_{t1} = PE_D(1) + h_t$.</p>
 <h2 id="CLIP-GEN"><a href="#CLIP-GEN" class="headerlink" title="CLIP-GEN"></a>CLIP-GEN</h2><p>整体来说网络没什么创新点，感觉就是CLIP VQVAE GPT的组合。主要创新点在于使用CLIP来间接的获取text-image 对，从而实现了使用没有label的数据进行训练的想法。</p>
-<p><img src="image/image-20220330204854561.png" srcset="/img/loading.gif" alt="image-20220330204854561"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/image-20220330204854561.png" srcset="/img/loading.gif" alt="image-20220330204854561"></p>
 <p>a. 使用无标签数据预训练一个VQVAE，将图片token化</p>
 <p>b. 使用CLIP将图片数据映射到一个和text相同的特征空间，利用a预训练好的VQVAE，将图片token化;之后训练一个从embedding到token的自回归transformer，来完成从CLIP特征空间到VQVAE token的映射，从而可以使用VQVAE的decoder完成图片生成</p>
 <p>c. 测试过程，使用CLIP将text映射到统一特征空间，使用b训练的transformer将embedding转化为token,然后使用decoder生成图片。</p>
