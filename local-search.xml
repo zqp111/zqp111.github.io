@@ -30,11 +30,11 @@
   
   
   <entry>
-    <title>vision transformer</title>
+    <title>学习记录</title>
     <link href="/2021/07/06/transformer/"/>
     <url>/2021/07/06/transformer/</url>
     
-    <content type="html"><![CDATA[<h1 id="本文记录一下我看过的transformer文章">本文记录一下我看过的transformer文章，</h1>]]></content>
+    <content type="html"><![CDATA[<h3 id="warm-up">warm up</h3><p>warm up 是一种治标之法，warm up能解决模型初期难以收敛的问题，但这种解决方式并不根本。因为模型前期难以收敛意味着模型会受到较大的扰动，即一点梯度的变化会影响整个模型的抖动。我们应该做的是修改模型的结构来解决这个问题而不是降低学习率。可以考虑是否是层数太多，一般来说，层数多的话，需要降低梯度的大小，否则会导致不收敛。</p><h3 id="增量爆炸">增量爆炸</h3><p>模型越深，对输出的扰动就越大。</p><h3 id="transformer-的pre-norm-和post-norm">transformer 的Pre Norm 和Post Norm</h3><p>一般来说，Pre Norm会比Post Norm更容易训练一些，但是Post Norm的最终效果往往更好。清华的一篇text-2-img文章CogView中，提出了一个三明治型的Norm方式，即同时使用Pre Norm 和 Post Norm。</p>]]></content>
     
     
     

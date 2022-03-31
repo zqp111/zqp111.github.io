@@ -17,7 +17,7 @@
   <meta name="description" content="主要有算法相关，计算机视觉相关，动作识别。">
   <meta name="author" content="zqp">
   <meta name="keywords" content="python，pytorch，计算机视觉，动作识别">
-  <title>vision transformer - 学习随笔</title>
+  <title>学习记录 - 学习随笔</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.5.3/css/bootstrap.min.css" />
 
@@ -166,7 +166,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="vision transformer">
+            <span class="h2" id="subtitle" title="学习记录">
               
             </span>
 
@@ -188,7 +188,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      13 字
+      232 字
     </span>
   
 
@@ -198,7 +198,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      2
        分钟
     </span>
   
@@ -228,10 +228,15 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">vision transformer</h1>
+            <h1 style="display: none">学习记录</h1>
             
             <div class="markdown-body">
-              <h1 id="本文记录一下我看过的transformer文章">本文记录一下我看过的transformer文章，</h1>
+              <h3 id="warm-up">warm up</h3>
+<p>warm up 是一种治标之法，warm up能解决模型初期难以收敛的问题，但这种解决方式并不根本。因为模型前期难以收敛意味着模型会受到较大的扰动，即一点梯度的变化会影响整个模型的抖动。我们应该做的是修改模型的结构来解决这个问题而不是降低学习率。可以考虑是否是层数太多，一般来说，层数多的话，需要降低梯度的大小，否则会导致不收敛。</p>
+<h3 id="增量爆炸">增量爆炸</h3>
+<p>模型越深，对输出的扰动就越大。</p>
+<h3 id="transformer-的pre-norm-和post-norm">transformer 的Pre Norm 和Post Norm</h3>
+<p>一般来说，Pre Norm会比Post Norm更容易训练一些，但是Post Norm的最终效果往往更好。清华的一篇text-2-img文章CogView中，提出了一个三明治型的Norm方式，即同时使用Pre Norm 和 Post Norm。</p>
 
             </div>
             <hr>

@@ -262,7 +262,7 @@ Auto-Encoder 模型是一种非常常见的学习高维数据的低维表示的�
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
-        <a href="/2021/07/06/transformer/">vision transformer</a>
+        <a href="/2021/07/06/transformer/">学习记录</a>
       </h1>
 
       <p class="index-excerpt">
@@ -271,8 +271,11 @@ Auto-Encoder 模型是一种非常常见的学习高维数据的低维表示的�
           
             
           
-          本文记录一下我看过的transformer文章，
-
+          warm up
+warm up 是一种治标之法，warm up能解决模型初期难以收敛的问题，但这种解决方式并不根本。因为模型前期难以收敛意味着模型会受到较大的扰动，即一点梯度的变化会影响整个模型的抖动。我们应该做的是修改模型的结构来解决这个问题而不是降低学习率。可以考虑是否是层数太多，一般来说，层数多的话，需要降低梯度的大小，否则会导致不收敛。
+增量爆炸
+模型越深，对输出的扰动就越大。
+t
         </a>
       </p>
 
