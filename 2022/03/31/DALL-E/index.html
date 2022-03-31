@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      22
+      23
        分钟
     </span>
   
@@ -232,11 +232,11 @@
 <p>两阶段训练过程：</p>
 <ul>
 <li>训练一个dVAE，作用是将原本$256 \times 256 \times 3$的RGB图片降为$32 \times 32$的codebook，每个取值范围为$[0, 8192]$的整数。相当于整体降维了192。避免后续训练transformer出现大内存、计算消耗。</li>
-<li>将一阶段得到的图片的$32 \times 32 = 1024$token和text的256个token进行联合训练一个transformer。</li>
+<li>将一阶段得到的图片的$32 \times 32 &#x3D; 1024$token和text的256个token进行联合训练一个transformer。</li>
 </ul>
 <h3 id="dVAE"><a href="#dVAE" class="headerlink" title="dVAE"></a>dVAE</h3><p>离散分布的重参数：Gumbel Softmax</p>
 <p><strong>重参数</strong>主要为了处理求期望形式的目标函数，对应于ELBO中的第一项。</p>
-<p>$$L_\theta = E_{z-p_\theta(z)}[f(z)]$$</p>
+<p>$$L_\theta &#x3D; E_{z-p_\theta(z)}[f(z)]$$</p>
 <p>对应于dVAE中的离散情况，我们可以将其写作：</p>
 <p>$$\sum_z p_\theta(z)f(z)$$</p>
 <p>直观上来看，z是离散值，有有限种值，那么可以直接对其进行求和求解。但是通常来讲，z的取值范围过大，这是一个几乎没有可能接受的做法。因此采用采样的方式来对其进行估计，直接进行采样，会丢失梯度，无法进行反传，采用Gumbel Softmax方法。</p>
@@ -246,15 +246,15 @@
 <h2 id="RQ-VAE"><a href="#RQ-VAE" class="headerlink" title="RQ-VAE"></a>RQ-VAE</h2><h3 id="VQ-VAE"><a href="#VQ-VAE" class="headerlink" title="VQ-VAE"></a>VQ-VAE</h3><p>codebook C: ${ (k, e(k)}_{k \in [K]}$, K表示codebook的大小, $e(k) \in R^{n_z}$</p>
 <p>输入图片：X, encoder：E, decoder: G, </p>
 <p>给定一个vector $z \in R^{n_z}$, 使用$Q(z; C)$来表示$z$的$VQ$，其计算也十分简单，为：</p>
-<p>$$ Q(z; C) = argmin_{k \in [K]} ||z-e(k)||_2^2$$</p>
+<p>$$ Q(z; C) &#x3D; argmin_{k \in [K]} ||z-e(k)||_2^2$$</p>
 <p>那么对于整张图片$X \in R^{H_o \times W_o \times 3}$，其在输入编码器后得到</p>
-<p>$$Z = E(X) \in R^{H \times W \times n_z}$$</p>
+<p>$$Z &#x3D; E(X) \in R^{H \times W \times n_z}$$</p>
 <p>这里我们使用VQ对Z进行编码，得到</p>
-<p>$$M_{hw} = Q(Z_{HW}; C), M_{hw} \in [K]^{hw}$$</p>
+<p>$$M_{hw} &#x3D; Q(Z_{HW}; C), M_{hw} \in [K]^{hw}$$</p>
 <p>即使用codebook的index来表示图片。之后就可以使用 quantized 特征$\hat{Z}$来代替原始的feature map Z:</p>
-<p>$$\hat{Z} = e(M_{hw}) \in R^{H \times W \times n_z}$$</p>
+<p>$$\hat{Z} &#x3D; e(M_{hw}) \in R^{H \times W \times n_z}$$</p>
 <p>之后即可使用$\hat{z}$ 送入G中对X进行重建</p>
-<p>$$\hat{X} = G(\hat{Z}) \in R^{H_o \times W_o \times 3}$$</p>
+<p>$$\hat{X} &#x3D; G(\hat{Z}) \in R^{H_o \times W_o \times 3}$$</p>
 <p>其中有几个值的大小需要重要理解，HW的大小表示将一个图片encoder后的code大小，其影响后续任务的复杂度，HW越小，复杂度越小。K表示整个codebook的大小，即图片能够选择的离散vector的多少，其越大，我们可以选择的特征越多，那么在计算$Q(z; C)$时能得到更好的特征近似。</p>
 <p>根据信息失真理论，我们使用$HWlog_2 K$ bits的数据去表示一张图片。</p>
 <h3 id="RQ-VAE-1"><a href="#RQ-VAE-1" class="headerlink" title="RQ-VAE"></a>RQ-VAE</h3><p>对于DALL-E来说，使用dVAE将一张$256 \times 256$的图片重新编码为$32 \times 32$的一系列分离的vector。而对于后续任务来说，更少的code有利于减少计算复杂度和空间复杂度，因为其和HW的二次成正比。那么减少编码后的HW看起来是一个降低复杂度的很理想的答案。但是如果保持整个codebook的大小不变的话，更少的code意味着会带来更大的重建损失，即code所表示的特征与原图片特征图差别会更大。然而我们如果采用增大codebook的方式来减少这种重建损失，又会带来 <strong>codebook collapse problem</strong>(此处还没有去深入了解)。因此本文提出使用Residual Quantization来解决这件事情。</p>
@@ -262,29 +262,29 @@
 <p>采用循环生成策略，每个特征对应的不再是一个code，而是一个code序列。</p>
 <p>不管是增大HW还是增大K，我们的目标都是在向减少重建误差靠齐。那么我们是否有办法使得codebook中的$e(M)$vector逼近图像的feature map呢。</p>
 <p>RQ-VAE给出了一个多次逼近的想法，即对于VQ-VAE，我们是在codebook中寻找一个最接近图片feature的vector作为其quantized 特征。而RQ-VAE在寻找到这个特征之后，会计算这个特征与feature的差值，然后在codebook中再寻找一个vector作为差值的近似，按照这种做法进行D次，得到一个深度为D的code。表示如下</p>
-<p>$$RQ(z;C, D) = (k_1, …, K_D) \in [K]^{D}$$</p>
+<p>$$RQ(z;C, D) &#x3D; (k_1, …, K_D) \in [K]^{D}$$</p>
 <p>我们将一个$z \in R^{n_z}$用D个index表示，其中每个index $k$ 计算如下</p>
-<p>$$k_d = Q(r_{d-1};C)$$</p>
-<p>$$r_d = r_{d-1}-e(k_d)$$</p>
-<p>我们定义$r_0 = z$, $\hat{z}^{(d)} = \sum_{i=1}^{d} e(k_i)$ ,那么$\hat{z}^1$就相当于VQ中的$\hat{z}$。这种思想的做法非常简单，就是通过多次的逼近误差，来达到更精确逼近$z$的想法。这种做法不会在没有增加K和HW的情况下，达到了更精确逼近特征的目的。</p>
+<p>$$k_d &#x3D; Q(r_{d-1};C)$$</p>
+<p>$$r_d &#x3D; r_{d-1}-e(k_d)$$</p>
+<p>我们定义$r_0 &#x3D; z$, $\hat{z}^{(d)} &#x3D; \sum_{i&#x3D;1}^{d} e(k_i)$ ,那么$\hat{z}^1$就相当于VQ中的$\hat{z}$。这种思想的做法非常简单，就是通过多次的逼近误差，来达到更精确逼近$z$的想法。这种做法不会在没有增加K和HW的情况下，达到了更精确逼近特征的目的。</p>
 <p>对于一个图片$X \in R^{H_o \times W_o \times 3}$，我们将其送入RQ-VAE，其会得到一个编码后的code $M \in [K]^{H \times W \times D}$，相比于VQ-VAE多出了一个深度D维，但是这并不影响之后的解码使用到的特征维数，因为这个深度D维所表示的是各阶误差，在使用时并不单独使用。</p>
-<p>$$M_{hw} = RQ(E(X)_{hw}; C, D)$$</p>
-<p>$$\hat{Z}^{(d)}<em>{hw} = \sum</em>{d’=1}^d e(M_{hwd’})$$</p>
+<p>$$M_{hw} &#x3D; RQ(E(X)_{hw}; C, D)$$</p>
+<p>$$\hat{Z}^{(d)}<em>{hw} &#x3D; \sum</em>{d’&#x3D;1}^d e(M_{hwd’})$$</p>
 <p>在进行解码时，我们是使用$\hat{Z}^{(D)}$来作为解码器$G$的输入，这里$\hat{Z}^{(D)}$可以理解为拥有最精确估计。</p>
-<p>$$\hat{X} = G(\hat{Z}^{(D)})$$</p>
+<p>$$\hat{X} &#x3D; G(\hat{Z}^{(D)})$$</p>
 <p><strong>训练LOSS</strong></p>
 <p>RQ-VAE的loss有两部分组成，一个是图片重建误差loss，另一个是各阶$\hat{Z}^{(D)}$的commitment loss</p>
-<p>$$L = L_{recon} + \beta L_{commit}$$</p>
-<p>$$L_{recon} = ||X-\hat{X}||^2_2$$</p>
-<p>$$L_{commit} = \sum_{d=1}^D ||Z-sg(\hat{Z}^{(d)})||^2_2$$</p>
+<p>$$L &#x3D; L_{recon} + \beta L_{commit}$$</p>
+<p>$$L_{recon} &#x3D; ||X-\hat{X}||^2_2$$</p>
+<p>$$L_{commit} &#x3D; \sum_{d&#x3D;1}^D ||Z-sg(\hat{Z}^{(d)})||^2_2$$</p>
 <p>其中$sg(\cdot)$表示禁止梯度反传。</p>
 <h3 id="RQ-transformer"><a href="#RQ-transformer" class="headerlink" title="RQ-transformer"></a>RQ-transformer</h3><p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/image-20220330185756506.png" srcset="/img/loading.gif" alt="image-20220330185756506"></p>
 <p>分为空间transformer和深度D的transformer两部分</p>
 <p>空间tansformer将$\hat{Z}^{(d-1)}$作为输入，来预测下一个值，第一个embedding使用可训练的embedding，并在不同的子任务中使用方式不同，例如在text-condition的任务中，使用text embedding作为头。</p>
-<p>$$u_t = PE_T(t) + \sum_{d=1}^D e(S_{t-1, d}) , , for , t &gt; 1$$</p>
+<p>$$u_t &#x3D; PE_T(t) + \sum_{d&#x3D;1}^D e(S_{t-1, d}) , , for , t &gt; 1$$</p>
 <p>而深度D的transformer略显复杂一些，其输入v相当于各阶层不同精确度的$\hat{Z}^{(d)}$，而且需要对不同的时间都做。</p>
-<p>$$v_{td} = PE_D(d)+\sum_{d’=1}^{d-1} e(S_{td’}) , , for , d&gt;1$$</p>
-<p>和空间基本类似，但特殊的，其第一个输入为当前t的空间transformer输出，即可以把深度D看为一个循环预测的transformer。$d=1, v_{t1} = PE_D(1) + h_t$.</p>
+<p>$$v_{td} &#x3D; PE_D(d)+\sum_{d’&#x3D;1}^{d-1} e(S_{td’}) , , for , d&gt;1$$</p>
+<p>和空间基本类似，但特殊的，其第一个输入为当前t的空间transformer输出，即可以把深度D看为一个循环预测的transformer。$d&#x3D;1, v_{t1} &#x3D; PE_D(1) + h_t$.</p>
 <h2 id="CLIP-GEN"><a href="#CLIP-GEN" class="headerlink" title="CLIP-GEN"></a>CLIP-GEN</h2><p>整体来说网络没什么创新点，感觉就是CLIP VQVAE GPT的组合。主要创新点在于使用CLIP来间接的获取text-image 对，从而实现了使用没有label的数据进行训练的想法。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/image-20220330204854561.png" srcset="/img/loading.gif" alt="image-20220330204854561"></p>
 <p>a. 使用无标签数据预训练一个VQVAE，将图片token化</p>

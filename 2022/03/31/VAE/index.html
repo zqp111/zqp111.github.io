@@ -194,7 +194,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      31
+      32
        分钟
     </span>
   
@@ -235,8 +235,8 @@
 <h3 id="VAE-1"><a href="#VAE-1" class="headerlink" title="VAE"></a>VAE</h3><p>上面说到，AE模型中的每个样本，都会映射到隐空间的一个点上，这导致其在隐空间中随机采样一个点并不能得到好的生成效果。VAE的想法与此不同，其不再将每个样本映射到隐空间的一个点上，而是将每一个样本都映射到一个分布上去，然后再从这个分布上采样一个点，去重建原本的样本，这样就做到了可以在隐空间中采样去生成图像。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/2584918486.png" srcset="/img/loading.gif" alt="事实上，vae是为每个样本构造专属的正态分布，然后采样来重构"></p>
 <p>图像来源<a target="_blank" rel="noopener" href="https://kexue.fm/archives/5253">科学空间</a></p>
-<p>生成模型的目标在于找到数据样本的分布，即我们给定一个数据集$X = {X_1, X_2, … X_n}$, 如果我们能找到一个分布$p(X)$, 其表示了数据集$X$的分布，那么我们就可以直接在$p(X)$中采样，得到所有的数据，包括数据集$X$中没有出现过的数据。然而这个目标是无法实现的，我们可以通过另一种方式来实现：</p>
-<p>$$p(X) = \sum_m p(m)p(x|m) = \int_zp(z)p(x|z)dz$$</p>
+<p>生成模型的目标在于找到数据样本的分布，即我们给定一个数据集$X &#x3D; {X_1, X_2, … X_n}$, 如果我们能找到一个分布$p(X)$, 其表示了数据集$X$的分布，那么我们就可以直接在$p(X)$中采样，得到所有的数据，包括数据集$X$中没有出现过的数据。然而这个目标是无法实现的，我们可以通过另一种方式来实现：</p>
+<p>$$p(X) &#x3D; \sum_m p(m)p(x|m) &#x3D; \int_zp(z)p(x|z)dz$$</p>
 <p>上面，$m \sim p(m), x|m \sim N(\mu^m, \delta^m)$。经过这样的变化，我们将存在大量失真区域的隐空间，转变为连续的隐空间。这里，VAE的想法就非常自然了，既然AE模型得到的只是隐空间中的一个点，那么VAE直接将其映射到一个正态分布，使得其能够包含整个隐空间。</p>
 <p>我们可以看出来，整个模型中包含：</p>
 <p>$$p(z) \sim N(0, 1), $$先验概率，即假设噪声z的分布服从标准正态分布。</p>
@@ -249,14 +249,14 @@
 <p>右边一项由于KL函数的性质，恒大于0，因此我们找到了$log , P(x)$的一个下界：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/ELBO.png" srcset="/img/loading.gif" alt="[公式]"></p>
 <p>我们将其记做$L_b$，那么原式可以写作：</p>
-<p>$$logP(x) = L_b+KL(q(z|x)||P(z|x))$$</p>
-<p>根据公式，$P(x) = \int_zP(z)P(x|z)dz$，当我们固定了$P(x|z)$，那么$P(x)$就是固定的，而此时我们可以通过调整$q(z|x)$即编码器，来使得KL散度项趋近于零。也就是说，L_b项可以代表我们想要求的$logP$。</p>
+<p>$$logP(x) &#x3D; L_b+KL(q(z|x)||P(z|x))$$</p>
+<p>根据公式，$P(x) &#x3D; \int_zP(z)P(x|z)dz$，当我们固定了$P(x|z)$，那么$P(x)$就是固定的，而此时我们可以通过调整$q(z|x)$即编码器，来使得KL散度项趋近于零。也就是说，L_b项可以代表我们想要求的$logP$。</p>
 <p>那么我们的优化目标就可以变为优化$L_b$。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/ELBO2.png" srcset="/img/loading.gif" alt="[公式]"></p>
 <p>对于第一项，由于我们有假设$q \sim N(\mu, \delta^2), P(z) \sim N(0, 1)$，可以根据KL散度公式进行展开，推导过程借用：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/zqp111/pic_bed/image/KL.png" srcset="/img/loading.gif" alt="img"></p>
 <p>对于第二项，我们可以将其表示为</p>
-<p>$$\int_zq(z|x)logP(x|z)dz = E_{q(z|x)}[logP(x|z)]$$</p>
+<p>$$\int_zq(z|x)logP(x|z)dz &#x3D; E_{q(z|x)}[logP(x|z)]$$</p>
 <p>可以将其理解为AE的损失函数。</p>
 <p>实际上我们从另一个角度理解这个损失函数，可以更具体一些。即我们一个朴素的思想还是，使得我们的重构误差最小，即上式中的第二项。但是VAE为什么还要有其他的loss呢？直观的，我们如果只包含一个重构loss，那么由于encoder得出的是一个均值和方差，为了让loss更小，模型学习的方法肯定会让方差等于0，也就是失去了随机噪声，VAE就会退化为AE模型。那么我们另一个直观的想法，既然后验分布需要一定的噪声，那么我们就强迫其向标准正态靠近，因此可以加一个loss来衡量它和标准正态的距离，这个衡量函数就是KL散度。</p>
 <p>代码实现：</p>
@@ -307,15 +307,15 @@
 <p>codebook C: ${ (k, e(k)}_{k \in [K]}$, K表示codebook的大小, $e(k) \in R^{n_z}$</p>
 <p>输入图片：X, encoder：E, decoder: G, </p>
 <p>给定一个vector $z \in R^{n_z}$, 使用$Q(z; C)$来表示$z$的$VQ$，其计算也十分简单，为：</p>
-<p>$$ Q(z; C) = argmin_{k \in [K]} ||z-e(k)||_2^2$$</p>
+<p>$$ Q(z; C) &#x3D; argmin_{k \in [K]} ||z-e(k)||_2^2$$</p>
 <p>那么对于整张图片$X \in R^{H_o \times W_o \times 3}$，其在输入编码器后得到</p>
-<p>$$Z = E(X) \in R^{H \times W \times n_z}$$</p>
+<p>$$Z &#x3D; E(X) \in R^{H \times W \times n_z}$$</p>
 <p>这里我们使用VQ对Z进行编码，得到</p>
-<p>$$M_{hw} = Q(Z_{HW}; C), M_{hw} \in [K]^{hw}$$</p>
+<p>$$M_{hw} &#x3D; Q(Z_{HW}; C), M_{hw} \in [K]^{hw}$$</p>
 <p>即使用codebook的index来表示图片。之后就可以使用 quantized 特征$\hat{Z}$来代替原始的feature map Z:</p>
-<p>$$\hat{Z} = e(M_{hw}) \in R^{H \times W \times n_z}$$</p>
+<p>$$\hat{Z} &#x3D; e(M_{hw}) \in R^{H \times W \times n_z}$$</p>
 <p>之后即可使用$\hat{z}$ 送入G中对X进行重建</p>
-<p>$$\hat{X} = G(\hat{Z}) \in R^{H_o \times W_o \times 3}$$</p>
+<p>$$\hat{X} &#x3D; G(\hat{Z}) \in R^{H_o \times W_o \times 3}$$</p>
 <p><strong>梯度反传</strong></p>
 <p>我们可以看到，在前向求$\hat{Z}$时，用到了$arg min$操作，这个操作本身是没有梯度的，如果我们在优化时，使用着一个loss：</p>
 <p>$$||x-decoder(\hat{z})||^2_2$$</p>
